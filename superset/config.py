@@ -616,6 +616,8 @@ DEFAULT_FEATURE_FLAGS: dict[str, bool] = {
     "AG_GRID_TABLE_ENABLED": False,
     # Enable Table v2 time comparison feature
     "TABLE_V2_TIME_COMPARISON_ENABLED": False,
+    # Enable Matrixify feature for matrix-style chart layouts
+    "MATRIXIFY": True,
 }
 
 # ------------------------------
