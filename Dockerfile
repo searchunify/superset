@@ -65,6 +65,7 @@ RUN --mount=type=bind,source=./superset-frontend/package.json,target=./package.j
     --mount=type=cache,target=/root/.cache \
     --mount=type=cache,target=/root/.npm \
     if [ "$DEV_MODE" = "false" ]; then \
+        echo "Running 'npm ci' in non-dev mode"; \
         npm ci; \
     else \
         echo "Skipping 'npm ci' in dev mode"; \
@@ -72,7 +73,8 @@ RUN --mount=type=bind,source=./superset-frontend/package.json,target=./package.j
 
 # Runs the webpack build process
 COPY superset-frontend /app/superset-frontend
-
+RUN echo "SUPER_USER_NEW";
+RUN echo "SUPER_USER_NEW: $SUPER_USER_NEW";
 ######################################################################
 # superset-node used for compile frontend assets
 ######################################################################
@@ -89,7 +91,7 @@ RUN --mount=type=cache,target=/root/.npm \
 
 # Copy translation files
 COPY superset/translations /app/superset/translations
-
+RUN echo "old SUPERSET_ENV: $SUPERSET_ENV";
 # Build the frontend if not in dev mode
 RUN if [ "$BUILD_TRANSLATIONS" = "true" ]; then \
         npm run build-translation; \
@@ -148,10 +150,11 @@ FROM python-base AS python-common
 ENV SUPERSET_HOME="/app/superset_home" \
     HOME="/app/superset_home" \
     SUPERSET_ENV="production" \
-    FLASK_APP="superset.app:create_app()" \
+    FLASK_APP="superset.app:create_app(superset_app_root='/su-bi')" \
     PYTHONPATH="/app/pythonpath" \
     SUPERSET_PORT="8088"
 
+RUN echo "new SUPERSET_ENV: $SUPERSET_ENV";
 # Copy the entrypoints, make them executable in userspace
 COPY --chmod=755 docker/entrypoints /app/docker/entrypoints
 
@@ -208,7 +211,7 @@ RUN rm superset/translations/*/*/*.po
 COPY --from=superset-node /app/superset/translations superset/translations
 COPY --from=python-translation-compiler /app/translations_mo superset/translations
 
-HEALTHCHECK CMD curl -f "http://localhost:${SUPERSET_PORT}/health"
+HEALTHCHECK CMD /app/docker/docker-healthcheck.sh
 CMD ["/app/docker/entrypoints/run-server.sh"]
 EXPOSE ${SUPERSET_PORT}
 

@@ -70,8 +70,8 @@ function toDevHTML(originalHtml) {
             })
             .map(chunkFilePath =>
               assetType === 'css'
-                ? `<link rel="stylesheet" type="text/css" href="${chunkFilePath}" />`
-                : `<script src="${chunkFilePath}"></script>`,
+                ? `<link rel="stylesheet" type="text/css" href="/su-bi${chunkFilePath}" />`
+                : `<script src="/su-bi${chunkFilePath}"></script>`,
             )
             .join(
               '\n  ',

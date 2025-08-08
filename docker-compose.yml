@@ -29,7 +29,6 @@ x-superset-volumes: &superset-volumes
   - ./superset-frontend:/app/superset-frontend
   - superset_home:/app/superset_home
   - ./tests:/app/tests
-
 x-common-build: &common-build
   context: .
   target: ${SUPERSET_BUILD_TARGET:-dev} # can use `dev` (default) or `lean`
@@ -43,6 +42,7 @@ x-common-build: &common-build
 
 services:
   nginx:
+    env_file: docker/.env # default
     image: nginx:latest
     container_name: superset_nginx
     restart: unless-stopped
@@ -52,36 +52,30 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/templates:/etc/nginx/templates:ro
+
   redis:
     image: redis:7
     container_name: superset_cache
     restart: unless-stopped
     ports:
-      - "127.0.0.1:6379:6379"
+      - "127.0.0.1:6388:6379"
     volumes:
       - redis:/data
 
   db:
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     image: postgres:15
     container_name: superset_db
     restart: unless-stopped
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:8800:5432"
     volumes:
-      - db_home:/var/lib/postgresql/data
+      - db_home_sp:/var/lib/postgresql/data
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   superset:
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     build:
       <<: *common-build
     container_name: superset_app
@@ -140,11 +134,7 @@ services:
       <<: *common-build
     container_name: superset_init
     command: ["/app/docker/docker-init.sh"]
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     depends_on:
       db:
         condition: service_started
@@ -181,11 +171,7 @@ services:
       - "127.0.0.1:9000:9000"  # exposing the dynamic webpack dev server
     container_name: superset_node
     command: ["/app/docker/docker-frontend.sh"]
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     volumes: *superset-volumes
 
   superset-worker:
@@ -193,11 +179,7 @@ services:
       <<: *common-build
     container_name: superset_worker
     command: ["/app/docker/docker-bootstrap.sh", "worker"]
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     environment:
       CELERYD_CONCURRENCY: 2
       CYPRESS_CONFIG: "${CYPRESS_CONFIG:-}"
@@ -221,11 +203,7 @@ services:
       <<: *common-build
     container_name: superset_worker_beat
     command: ["/app/docker/docker-bootstrap.sh", "beat"]
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     restart: unless-stopped
     depends_on:
       - superset-worker
@@ -242,11 +220,7 @@ services:
       <<: *common-build
     container_name: superset_tests_worker
     command: ["/app/docker/docker-bootstrap.sh", "worker"]
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     profiles:
       - optional
     environment:
@@ -269,7 +243,7 @@ services:
 volumes:
   superset_home:
     external: false
-  db_home:
+  db_home_sp:
     external: false
   redis:
     external: false

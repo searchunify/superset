@@ -24,7 +24,7 @@ from typing import Any, Callable, TYPE_CHECKING
 
 import wtforms_json
 from deprecation import deprecated
-from flask import abort, Flask, redirect, request, session
+from flask import Flask, redirect, url_for
 from flask_appbuilder import expose, IndexView
 from flask_appbuilder.api import safe
 from flask_appbuilder.utils.base import get_safe_redirect
@@ -225,6 +225,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         #
         # Setup regular views
         #
+        app_root = appbuilder.app.config["APPLICATION_ROOT"]
         appbuilder.add_link(
             "Home",
             label=__("Home"),
@@ -260,7 +261,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_link(
             "Datasets",
             label=__("Datasets"),
-            href="/tablemodelview/list/",
+            href=f"{app_root}/tablemodelview/list/",
             icon="fa-table",
             category="",
             category_icon="",
@@ -313,7 +314,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_link(
             "SQL Editor",
             label=__("SQL Lab"),
-            href="/sqllab/",
+            href=f"{app_root}/sqllab/",
             category_icon="fa-flask",
             icon="fa-flask",
             category="SQL Lab",
@@ -322,7 +323,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_link(
             "Saved Queries",
             label=__("Saved Queries"),
-            href="/savedqueryview/list/",
+            href=f"{app_root}/savedqueryview/list/",
             icon="fa-save",
             category="SQL Lab",
             category_label=__("SQL"),
@@ -330,7 +331,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_link(
             "Query Search",
             label=__("Query History"),
-            href="/sqllab/history/",
+            href=f"{app_root}/sqllab/history/",
             icon="fa-search",
             category_icon="fa-flask",
             category="SQL Lab",
@@ -377,7 +378,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             AnnotationLayerView,
             "Annotation Layers",
             label=__("Annotation Layers"),
-            href="/annotationlayer/list/",
+            href="AnnotationLayerView.list",
             icon="fa-comment",
             category_icon="",
             category="Manage",
@@ -387,7 +388,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_view(
             RowLevelSecurityView,
             "Row Level Security",
-            href="/rowlevelsecurity/list/",
+            href="RowLevelSecurityView.list",
             label=__("Row Level Security"),
             category="Security",
             category_label=__("Security"),
@@ -693,25 +694,4 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
 class SupersetIndexView(IndexView):
     @expose("/")
     def index(self) -> FlaskResponse:
-        return redirect("/superset/welcome/")
-
-    @expose("/lang/<string:locale>")
-    @safe
-    def patch_flask_locale(self, locale: str) -> FlaskResponse:
-        """
-        Change user's locale and redirect back to the previous page.
-
-        Overrides FAB's babel.views.LocaleView so we can use the request
-        Referrer as the redirect target, in case our previous page was actually
-        served by the frontend (and thus not added to the session's page_history
-        stack).
-        """
-        if locale not in self.appbuilder.bm.languages:
-            abort(404, description="Locale not supported.")
-        session["locale"] = locale
-        refresh()
-        self.update_redirect()
-
-        if redirect_to := request.headers.get("Referer"):
-            return redirect(get_safe_redirect(redirect_to))
-        return redirect(self.get_redirect())
+        return redirect(url_for("Superset.welcome"))

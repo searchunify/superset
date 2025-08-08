@@ -41,24 +41,16 @@ services:
       - redis:/data
 
   db:
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     image: postgres:15
     container_name: superset_db
     restart: unless-stopped
     volumes:
-      - db_home:/var/lib/postgresql/data
+      - db_home_sp_prod:/var/lib/postgresql/data
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   superset:
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     build:
       <<: *common-build
     container_name: superset_app
@@ -79,11 +71,7 @@ services:
     build:
       <<: *common-build
     command: ["/app/docker/docker-init.sh"]
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     depends_on:
       db:
         condition: service_started
@@ -102,11 +90,7 @@ services:
       <<: *common-build
     container_name: superset_worker
     command: ["/app/docker/docker-bootstrap.sh", "worker"]
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     restart: unless-stopped
     depends_on:
       superset-init:
@@ -127,11 +111,7 @@ services:
       <<: *common-build
     container_name: superset_worker_beat
     command: ["/app/docker/docker-bootstrap.sh", "beat"]
-    env_file:
-      - path: docker/.env # default
-        required: true
-      - path: docker/.env-local # optional override
-        required: false
+    env_file: docker/.env
     restart: unless-stopped
     depends_on:
       superset-init:
@@ -146,7 +126,7 @@ services:
 volumes:
   superset_home:
     external: false
-  db_home:
+  db_home_sp_prod:
     external: false
   redis:
     external: false

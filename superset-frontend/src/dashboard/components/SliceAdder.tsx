@@ -46,6 +46,7 @@ import Checkbox from 'src/components/Checkbox';
 import { InfoTooltipWithTrigger } from '@superset-ui/chart-controls';
 import { Dispatch } from 'redux';
 import { Slice } from 'src/dashboard/types';
+import { navigateTo } from 'src/utils/navigationUtils';
 import AddSliceCard from './AddSliceCard';
 import AddSliceDragPreview from './dnd/AddSliceDragPreview';
 import { DragDroppable } from './dnd/DragDroppable';
@@ -359,11 +360,9 @@ class SliceAdder extends Component<SliceAdderProps, SliceAdderState> {
             buttonStyle="link"
             buttonSize="xsmall"
             onClick={() =>
-              window.open(
-                `/chart/add?dashboard_id=${this.props.dashboardId}`,
-                '_blank',
-                'noopener noreferrer',
-              )
+              navigateTo(`/chart/add?dashboard_id=${this.props.dashboardId}`, {
+                newWindow: true,
+              })
             }
           >
             <Icons.PlusSmall />

@@ -100,6 +100,7 @@ describe('AllEntitiesTable', () => {
         objects={mockObjects}
         canEditTag
       />,
+      { useRouter: true },
     );
 
     expect(
@@ -135,6 +136,7 @@ describe('AllEntitiesTable', () => {
         objects={mockObjectsWithTags}
         canEditTag
       />,
+      { useRouter: true },
     );
 
     expect(screen.getByText('Dashboards')).toBeInTheDocument();

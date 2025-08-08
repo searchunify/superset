@@ -71,7 +71,7 @@ CACHE_CONFIG = {
     "CACHE_REDIS_DB": REDIS_RESULTS_DB,
 }
 DATA_CACHE_CONFIG = CACHE_CONFIG
-
+THUMBNAIL_CACHE_CONFIG = CACHE_CONFIG
 
 class CeleryConfig:
     broker_url = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
@@ -95,14 +95,68 @@ class CeleryConfig:
         },
     }
 
-
+STATIC_ASSETS_PREFIX = "/su-bi"
 CELERY_CONFIG = CeleryConfig
 
-FEATURE_FLAGS = {"ALERT_REPORTS": True}
+FEATURE_FLAGS = {
+    "EMBEDDED_SUPERSET": True,
+    "ENABLE_TEMPLATE_PROCESSING": True,
+    "ALERT_REPORTS": True,
+    "ALLOW_ADHOC_SUBQUERY": True,
+    "DRILL_TO_DETAIL": True,
+    "HORIZONTAL_FILTER_BAR": True
+}
+
+# Allow embedding from any origin (or restrict to your domain)
+HTTP_HEADERS = {
+    "X-Frame-Options": "ALLOWALL"
+}
+ENABLE_CORS = True
+
+CORS_OPTIONS = {
+    "supports_credentials": True,
+    "allow_headers": "*",
+    "expose_headers": "*",
+    "resources": "*",
+    "origins": ["http://localhost", "http://localhost:3002", "http://localhost:5000"],
+}
+
+HTTP_HEADERS = {
+    "X-Frame-Options": "ALLOWALL"
+}
+
+GUEST_ROLE_NAME = "Gamma"
+
+TALISMAN_ENABLED = True
+# Allow embedding in iframes from localhost:8000
+TALISMAN_CONFIG = {
+    "frame_options": None,  # Disables X-Frame-Options header
+    "force_https":False,
+    "force_https_permanent": False, # Set to True in production if behind HTTPS
+
+    "content_security_policy": {
+        "default-src": ["'self'",  "https://feature-ai.searchunify.com", "https://feature1.searchunify.com", "http://localhost:3000","http://localhost:8083", "http://localhost"],
+        "script-src": ["'self'", "https://feature-ai.searchunify.com", "https://feature1.searchunify.com", "http://localhost:3000","http://localhost:8083" ,"http://localhost", "'unsafe-inline'", "'unsafe-eval'"], # 'unsafe-inline' and 'unsafe-eval' are often needed by Superset's UI libraries but reduce security. Strive to remove them if possible by refactoring.
+        "style-src": ["'self'", "https://feature-ai.searchunify.com", "https://feature1.searchunify.com", "http://localhost:3000","http://localhost:8083", "'unsafe-inline'"], # 'unsafe-inline' for styles
+        "img-src": ["'self'", "data:", "blob:", "https://apachesuperset.gateway.scarf.sh", "https://static.scarf.sh", "https://feature-ai.searchunify.com","http://localhost", "http://localhost:3000","http://localhost:8083"], # 'data:' for inline images, 'blob:' for some chart downloads
+        "worker-src": ["'self'", "blob:", "https://feature-ai.searchunify.com", "https://feature1.searchunify.com",  "http://localhost", "http://localhost:3000","http://localhost:8083"], # For web workers used by some libraries
+        "connect-src": ["'self'", "https://feature-ai.searchunify.com", "https://feature1.searchunify.com", "http://localhost","http://localhost:3000","http://localhost:8083"], # For API calls
+        "frame-src": ["'self'", "http://localhost", "http://localhost:3002", "http://localhost:5000"], # If you embed Superset or allow embedding from Superset
+        "frame-ancestors": ["'self'", "http://localhost", "http://localhost:3002", "http://localhost:5000"], # Allow your React app's origin (e.g., http://localhost:3000)
+        "object-src": ["'none'", "https://feature-ai.searchunify.com", "https://feature1.searchunify.com", "http://localhost","http://localhost:3000","http://localhost:8083"], # Usually good to keep 'none'
+        "font-src": ["'self'", "https://feature-ai.searchunify.com", "https://feature1.searchunify.com", "http://localhost","http://localhost:3000","http://localhost:8083"],
+    },
+    "content_security_policy_nonce_in": ["script-src"], # Enables use of nonces for scripts
+    "session_cookie_secure": False, # Set to True in production if behind HTTPS
+    "session_cookie_samesite": "Lax",
+}
+
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
-WEBDRIVER_BASEURL = "http://superset:8088/"  # When using docker compose baseurl should be http://superset_app:8088/  # noqa: E501
+WEBDRIVER_BASEURL = f"http://superset_app{os.environ.get('SUPERSET_APP_ROOT', '/')}/"  # When using docker compose baseurl should be http://superset_nginx{ENV{BASEPATH}}/  # noqa: E501
 # The base URL for the email report hyperlinks.
-WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
+WEBDRIVER_BASEURL_USER_FRIENDLY = (
+    f"http://localhost:8888/{os.environ.get('SUPERSET_APP_ROOT', '/')}/"
+)
 SQLLAB_CTAS_NO_LIMIT = True
 
 log_level_text = os.getenv("SUPERSET_LOG_LEVEL", "INFO")
