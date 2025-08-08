@@ -65,7 +65,6 @@ RUN --mount=type=bind,source=./superset-frontend/package.json,target=./package.j
     --mount=type=cache,target=/root/.cache \
     --mount=type=cache,target=/root/.npm \
     if [ "$DEV_MODE" = "false" ]; then \
-        echo "Running 'npm ci' in non-dev mode"; \
         npm ci; \
     else \
         echo "Skipping 'npm ci' in dev mode"; \
@@ -73,8 +72,6 @@ RUN --mount=type=bind,source=./superset-frontend/package.json,target=./package.j
 
 # Runs the webpack build process
 COPY superset-frontend /app/superset-frontend
-RUN echo "SUPER_USER_NEW";
-RUN echo "SUPER_USER_NEW: $SUPER_USER_NEW";
 ######################################################################
 # superset-node used for compile frontend assets
 ######################################################################
@@ -83,7 +80,6 @@ FROM superset-node-ci AS superset-node
 # Build the frontend if not in dev mode
 RUN --mount=type=cache,target=/root/.npm \
     if [ "$DEV_MODE" = "false" ]; then \
-        echo "Running 'npm run ${BUILD_CMD}'"; \
         npm run ${BUILD_CMD}; \
     else \
         echo "Skipping 'npm run ${BUILD_CMD}' in dev mode"; \
@@ -91,7 +87,7 @@ RUN --mount=type=cache,target=/root/.npm \
 
 # Copy translation files
 COPY superset/translations /app/superset/translations
-RUN echo "old SUPERSET_ENV: $SUPERSET_ENV";
+
 # Build the frontend if not in dev mode
 RUN if [ "$BUILD_TRANSLATIONS" = "true" ]; then \
         npm run build-translation; \
@@ -154,7 +150,6 @@ ENV SUPERSET_HOME="/app/superset_home" \
     PYTHONPATH="/app/pythonpath" \
     SUPERSET_PORT="8088"
 
-RUN echo "new SUPERSET_ENV: $SUPERSET_ENV";
 # Copy the entrypoints, make them executable in userspace
 COPY --chmod=755 docker/entrypoints /app/docker/entrypoints
 
