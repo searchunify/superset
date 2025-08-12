@@ -319,6 +319,31 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         ...seriesOrderSection,
         ['color_scheme'],
+        [
+          {
+            name: 'bar_width',
+            config: {
+              type: 'TextControl',
+              label: t('Bar Width'),
+              description: t('Width of the horizontal bar in pixels'),
+              default: 5,
+            },
+          },
+        ],
+        [
+          {
+            name: 'barRadius',
+            config: {
+              type: 'TextControl',
+              label: t('Bar Radius'),
+              description: t(
+                'Border radius of bars in pixels (0 for sharp corners)',
+              ),
+              default: 0,
+              renderTrigger: true,
+            },
+          },
+        ],
         ['time_shift_color'],
         ...showValueSection,
         [minorTicks],

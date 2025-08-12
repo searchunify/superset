@@ -169,6 +169,9 @@ export function transformSeries(
     queryIndex?: number;
     timeCompare?: string[];
     timeShiftColor?: boolean;
+    barRadius?: number;
+    seriesIndex?: number;
+    totalSeriesCount?: number;
   },
 ): SeriesOption | undefined {
   const { name } = series;
@@ -198,6 +201,9 @@ export function transformSeries(
     queryIndex = 0,
     timeCompare = [],
     timeShiftColor,
+    barRadius,
+    seriesIndex,
+    totalSeriesCount,
   } = opts;
   const contexts = seriesContexts[name || ''] || [];
   const hasForecast =
@@ -260,6 +266,33 @@ export function transformSeries(
     itemStyle.borderWidth = 1.5;
     itemStyle.borderType = 'dotted';
     itemStyle.borderColor = itemStyle.color;
+  }
+  if (seriesType === 'bar' && barRadius && barRadius > 0) {
+    const radius = parseInt(`${barRadius}`, 10);
+
+    if (stack && totalSeriesCount && totalSeriesCount > 1) {
+      // For stacked bars, apply radius based on position
+      const isFirstSeries = seriesIndex === 0;
+      const isLastSeries = seriesIndex === totalSeriesCount - 1;
+
+      // [tl, tr, br, bl]
+      if (isFirstSeries && isLastSeries) {
+        // Single series in stack - apply radius to all corners
+        itemStyle.borderRadius = [radius, radius, radius, radius];
+      } else if (isFirstSeries) {
+        // First series in stack - apply radius to top corners only
+        itemStyle.borderRadius = [radius, 0, 0, radius];
+      } else if (isLastSeries) {
+        // Last series in stack - apply radius to bottom corners only
+        itemStyle.borderRadius = [0, radius, radius, 0];
+      } else {
+        // Middle series in stack - no radius
+        itemStyle.borderRadius = [0, 0, 0, 0];
+      }
+    } else {
+      // For non-stacked bars, apply radius to all corners
+      itemStyle.borderRadius = [radius, radius, radius, radius];
+    }
   }
   let emphasis = {};
   let showSymbol = false;

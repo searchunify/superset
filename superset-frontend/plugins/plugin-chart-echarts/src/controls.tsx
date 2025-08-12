@@ -270,7 +270,7 @@ const sortSeriesAscending: ControlSetItem = {
     label: t('Sort Series Ascending'),
     default: DEFAULT_SORT_SERIES_DATA.sort_series_ascending,
     renderTrigger: true,
-    description: t('Sort series in ascending order'),
+    description: t('Test Sort series in ascending order'),
   },
 };
 

@@ -142,6 +142,7 @@ export default function transformProps(
   const {
     area,
     annotationLayers,
+    barRadius,
     colorScheme,
     contributionMode,
     forecastEnabled,
@@ -284,7 +285,7 @@ export default function transformProps(
 
   let patternIncrement = 0;
 
-  rawSeries.forEach(entry => {
+  rawSeries.forEach((entry, index) => {
     const derivedSeries = isDerivedSeries(entry, chartProps.rawFormData);
     const lineStyle: LineStyleOption = {};
     if (derivedSeries) {
@@ -331,6 +332,9 @@ export default function transformProps(
         lineStyle,
         timeCompare: array,
         timeShiftColor,
+        barRadius,
+        seriesIndex: index,
+        totalSeriesCount: rawSeries.length,
       },
     );
     if (transformedSeries) {
