@@ -7,6 +7,7 @@ This chart type extends the standard ECharts timeseries bar chart with additiona
 - **Bar Radius**: Add rounded corners to bars by setting a border radius in pixels
 - **Bar Width**: Control the width of bars in pixels
 - **Axis & Grid Control**: Show/hide X axis, Y axis, and grid lines
+- **Custom Series Colors**: Define specific colors for individual series
 - **Orientation**: Support for both vertical and horizontal bar orientations
 - **All standard timeseries features**: Time-based data, forecasting, annotations, etc.
 
@@ -38,6 +39,16 @@ The axis and grid display controls allow you to show or hide various chart eleme
 - **Default**: All elements are shown (true)
 - **Effect**: Applies `show` property to axis components and `splitLine.show` to grid lines
 
+### Custom Series Colors
+
+The custom series colors feature allows you to define specific colors for individual series:
+
+- **Default**: Empty object `{}`
+- **Format**: JSON object with series names as keys and hex color codes as values
+- **Example**: `{"Sales": "#FF0000", "Revenue": "#00FF00"}`
+- **Effect**: Overrides the color scheme for specified series, takes priority over the selected color scheme
+- **Priority**: Custom colors > Color scheme colors
+
 ### Stacked Bar Radius Behavior
 
 When using stacked bars, the border radius is intelligently applied based on the series position:
@@ -60,22 +71,27 @@ This ensures that stacked bars have a cohesive appearance with rounded corners o
    - **Show X Axis**: Toggle X axis visibility
    - **Show Y Axis**: Toggle Y axis visibility
    - **Show Grid Lines**: Toggle grid line visibility
-4. The chart will update in real-time with your styling and display preferences
+4. In the "Custom Series Colors" field, define specific colors:
+   - Enter JSON format: `{"Series Name": "#color"}`
+   - Example: `{"Sales": "#FF0000", "Revenue": "#00FF00"}`
+5. The chart will update in real-time with your styling and display preferences
 
 ### Technical Implementation
 
 The bar styling and display features are implemented by:
 
-1. Adding `barRadius?: number`, `barWidth?: number`, `showXAxis?: boolean`, `showYAxis?: boolean`, and `showGridLines?: boolean` to the `EchartsTimeseriesFormData` type
-2. Setting default values in `DEFAULT_FORM_DATA` (barRadius: 0, barWidth: 5, showXAxis: true, showYAxis: true, showGridLines: true)
+1. Adding `barRadius?: number`, `barWidth?: number`, `showXAxis?: boolean`, `showYAxis?: boolean`, `showGridLines?: boolean`, and `customSeriesColors?: Record<string, string>` to the `EchartsTimeseriesFormData` type
+2. Setting default values in `DEFAULT_FORM_DATA` (barRadius: 0, barWidth: 5, showXAxis: true, showYAxis: true, showGridLines: true, customSeriesColors: {})
 3. Adding control components in the control panel for user input:
    - `TextControl` for bar radius and width
    - `CheckboxControl` for axis and grid visibility
+   - `TextAreaControl` for custom series colors (with JSON language support)
 4. Applying the properties in the `transformSeries` function when `seriesType === 'bar'`
 5. For stacked bars, passing `seriesIndex` and `totalSeriesCount` to determine position
 6. Applying different border radius arrays based on series position in the stack
 7. Applying bar width to all bar series when specified
 8. Applying axis and grid visibility settings in `transformProps.ts` by setting `show` properties on axis components and `splitLine.show` for grid lines
+9. Applying custom series colors in `transformSeries` by checking for custom colors before using the color scale
 
 ### Example
 
@@ -120,17 +136,33 @@ The bar styling and display features are implemented by:
     default: true,
     renderTrigger: true,
   },
-},
-{
-  name: 'showGridLines',
-  config: {
-    type: 'CheckboxControl',
-    label: t('Show Grid Lines'),
-    description: t('Show or hide grid lines'),
-    default: true,
-    renderTrigger: true,
   },
-}
+  {
+    name: 'showGridLines',
+    config: {
+      type: 'CheckboxControl',
+      label: t('Show Grid Lines'),
+      description: t('Show or hide grid lines'),
+      default: true,
+      renderTrigger: true,
+    },
+  },
+  {
+    name: 'customSeriesColors',
+    config: {
+      type: 'TextAreaControl',
+      label: t('Custom Series Colors'),
+      description: t(
+        'Define custom colors for specific series. Format: {"Series Name": "#color"}',
+      ),
+      default: '{}',
+      language: 'json',
+      offerEditInModal: false,
+      minLines: 3,
+      maxLines: 8,
+      renderTrigger: true,
+    },
+  }
 
 // In the transformer
 if (seriesType === 'bar' && barRadius && barRadius > 0) {
@@ -165,6 +197,32 @@ if (seriesType === 'bar' && barRadius && barRadius > 0) {
 if (seriesType === 'bar' && barWidth && barWidth > 0) {
   seriesConfig.barWidth = barWidth;
 }
+
+// Apply custom series colors
+const seriesName = seriesKey || forecastSeries.name;
+
+// Parse custom series colors from JSON string
+let customColorMap: Record<string, string> = {};
+if (customSeriesColors) {
+  try {
+    customColorMap = JSON.parse(customSeriesColors);
+  } catch (error) {
+    // If JSON parsing fails, use empty object
+    console.warn('Failed to parse custom series colors:', error);
+  }
+}
+
+const customColor = customColorMap[seriesName];
+
+const itemStyle: ItemStyleOption = {
+  color:
+    customColor ||
+    (timeShiftColor
+      ? colorScale(colorScaleKey, sliceId)
+      : colorScale(seriesName, sliceId)),
+  opacity,
+  borderWidth: 0,
+};
 
 // In transformProps.ts - Apply axis and grid visibility
 let xAxis: any = {

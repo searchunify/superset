@@ -99,6 +99,7 @@ export type EchartsTimeseriesFormData = QueryFormData & {
   showXAxis?: boolean;
   showYAxis?: boolean;
   showGridLines?: boolean;
+  customSeriesColors?: string;
 } & LegendFormData &
   TitleFormData;
 

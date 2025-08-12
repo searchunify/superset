@@ -68,6 +68,7 @@ params:
   showXAxis: true
   showYAxis: true
   showGridLines: false
+  customSeriesColors: '{"Sales": "#FF0000", "Revenue": "#00FF00"}'
   extra_form_data: {}
   dashboards:
     - 13

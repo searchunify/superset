@@ -164,4 +164,48 @@ describe('transformSeries', () => {
     const result = transformSeries(series, mockColorScale, 'test-key', opts);
     expect((result as any)?.barWidth).toBeUndefined();
   });
+
+  it('should apply custom series color when provided', () => {
+    const opts = {
+      seriesType: EchartsTimeseriesSeriesType.Bar,
+      customSeriesColors: '{"test-key": "#FF0000"}',
+    };
+    const result = transformSeries(series, mockColorScale, 'test-key', opts);
+    expect((result as any)?.itemStyle?.color).toBe('#FF0000');
+  });
+
+  it('should use color scale when custom color is not provided', () => {
+    const opts = {
+      seriesType: EchartsTimeseriesSeriesType.Bar,
+      customSeriesColors: '{"other-series": "#FF0000"}',
+    };
+    const result = transformSeries(series, mockColorScale, 'test-key', opts);
+    expect((result as any)?.itemStyle?.color).toBe('#000000'); // mockColorScale returns '#000000'
+  });
+
+  it('should use color scale when customSeriesColors is empty', () => {
+    const opts = {
+      seriesType: EchartsTimeseriesSeriesType.Bar,
+      customSeriesColors: '{}',
+    };
+    const result = transformSeries(series, mockColorScale, 'test-key', opts);
+    expect((result as any)?.itemStyle?.color).toBe('#000000'); // mockColorScale returns '#000000'
+  });
+
+  it('should use color scale when customSeriesColors is undefined', () => {
+    const opts = {
+      seriesType: EchartsTimeseriesSeriesType.Bar,
+    };
+    const result = transformSeries(series, mockColorScale, 'test-key', opts);
+    expect((result as any)?.itemStyle?.color).toBe('#000000'); // mockColorScale returns '#000000'
+  });
+
+  it('should handle invalid JSON gracefully', () => {
+    const opts = {
+      seriesType: EchartsTimeseriesSeriesType.Bar,
+      customSeriesColors: '{"invalid": json}',
+    };
+    const result = transformSeries(series, mockColorScale, 'test-key', opts);
+    expect((result as any)?.itemStyle?.color).toBe('#000000'); // mockColorScale returns '#000000'
+  });
 });

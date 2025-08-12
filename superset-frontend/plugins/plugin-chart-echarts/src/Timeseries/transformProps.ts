@@ -148,6 +148,7 @@ export default function transformProps(
     showXAxis,
     showYAxis,
     showGridLines,
+    customSeriesColors,
     contributionMode,
     forecastEnabled,
     groupby,
@@ -340,6 +341,7 @@ export default function transformProps(
         barWidth,
         seriesIndex: index,
         totalSeriesCount: rawSeries.length,
+        customSeriesColors,
       },
     );
     if (transformedSeries) {

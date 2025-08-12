@@ -321,6 +321,25 @@ const config: ControlPanelConfig = {
         ['color_scheme'],
         [
           {
+            name: 'customSeriesColors',
+            config: {
+              type: 'TextAreaControl',
+              label: t('Custom Series Colors'),
+              description: t(
+                'Define custom colors for specific series. Format: {"Series Name": "#color"}',
+              ),
+              default: '{}',
+              initialValue: '{}',
+              language: 'json',
+              offerEditInModal: false,
+              minLines: 3,
+              maxLines: 8,
+              renderTrigger: true,
+            },
+          },
+        ],
+        [
+          {
             name: 'barWidth',
             config: {
               type: 'TextControl',
@@ -416,6 +435,11 @@ const config: ControlPanelConfig = {
     ...formData,
     metrics: getStandardizedControls().popAllMetrics(),
     groupby: getStandardizedControls().popAllColumns(),
+    // Ensure customSeriesColors is always a string for TextAreaControl
+    customSeriesColors:
+      typeof formData.customSeriesColors === 'string'
+        ? formData.customSeriesColors
+        : JSON.stringify(formData.customSeriesColors || {}),
   }),
 };
 
