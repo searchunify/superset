@@ -170,6 +170,7 @@ export function transformSeries(
     timeCompare?: string[];
     timeShiftColor?: boolean;
     barRadius?: number;
+    barWidth?: number;
     seriesIndex?: number;
     totalSeriesCount?: number;
   },
@@ -202,6 +203,7 @@ export function transformSeries(
     timeCompare = [],
     timeShiftColor,
     barRadius,
+    barWidth,
     seriesIndex,
     totalSeriesCount,
   } = opts;
@@ -321,7 +323,7 @@ export function transformSeries(
     isConfidenceBand || (stack === StackControlsValue.Stream && area)
       ? { ...opts.lineStyle, opacity: OpacityEnum.Transparent }
       : { ...opts.lineStyle, opacity };
-  return {
+  const seriesConfig: any = {
     ...series,
     connectNulls,
     queryIndex,
@@ -390,6 +392,13 @@ export function transformSeries(
       },
     },
   };
+
+  // Apply bar width for bar series
+  if (seriesType === 'bar' && barWidth && barWidth > 0) {
+    seriesConfig.barWidth = barWidth;
+  }
+
+  return seriesConfig;
 }
 
 export function transformFormulaAnnotation(

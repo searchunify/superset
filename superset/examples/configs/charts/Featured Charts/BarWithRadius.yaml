@@ -64,6 +64,10 @@ params:
   rich_tooltip: true
   tooltipTimeFormat: smart_date
   barRadius: 8
+  barWidth: 15
+  showXAxis: true
+  showYAxis: true
+  showGridLines: false
   extra_form_data: {}
   dashboards:
     - 13

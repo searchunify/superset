@@ -321,12 +321,13 @@ const config: ControlPanelConfig = {
         ['color_scheme'],
         [
           {
-            name: 'bar_width',
+            name: 'barWidth',
             config: {
               type: 'TextControl',
               label: t('Bar Width'),
-              description: t('Width of the horizontal bar in pixels'),
+              description: t('Width of bars in pixels'),
               default: 5,
+              renderTrigger: true,
             },
           },
         ],
@@ -367,6 +368,47 @@ const config: ControlPanelConfig = {
         ...richTooltipSection,
         [<ControlSubSectionHeader>{t('Y Axis')}</ControlSubSectionHeader>],
         ...createAxisControl('y'),
+        [
+          <ControlSubSectionHeader>
+            {t('Axis & Grid Display')}
+          </ControlSubSectionHeader>,
+        ],
+        [
+          {
+            name: 'showXAxis',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show X Axis'),
+              description: t('Show or hide the X axis'),
+              default: true,
+              renderTrigger: true,
+            },
+          },
+        ],
+        [
+          {
+            name: 'showYAxis',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show Y Axis'),
+              description: t('Show or hide the Y axis'),
+              default: true,
+              renderTrigger: true,
+            },
+          },
+        ],
+        [
+          {
+            name: 'showGridLines',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show Grid Lines'),
+              description: t('Show or hide grid lines'),
+              default: true,
+              renderTrigger: true,
+            },
+          },
+        ],
       ],
     },
   ],

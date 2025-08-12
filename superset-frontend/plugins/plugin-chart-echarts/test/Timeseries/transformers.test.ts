@@ -129,4 +129,39 @@ describe('transformSeries', () => {
     const result = transformSeries(series, mockColorScale, 'test-key', opts);
     expect((result as any)?.itemStyle?.borderRadius).toEqual([5, 5, 5, 5]);
   });
+
+  it('should apply bar width for bar series', () => {
+    const opts = {
+      seriesType: EchartsTimeseriesSeriesType.Bar,
+      barWidth: 20,
+    };
+    const result = transformSeries(series, mockColorScale, 'test-key', opts);
+    expect((result as any)?.barWidth).toBe(20);
+  });
+
+  it('should not apply bar width for non-bar series', () => {
+    const opts = {
+      seriesType: EchartsTimeseriesSeriesType.Line,
+      barWidth: 20,
+    };
+    const result = transformSeries(series, mockColorScale, 'test-key', opts);
+    expect((result as any)?.barWidth).toBeUndefined();
+  });
+
+  it('should not apply bar width when barWidth is 0', () => {
+    const opts = {
+      seriesType: EchartsTimeseriesSeriesType.Bar,
+      barWidth: 0,
+    };
+    const result = transformSeries(series, mockColorScale, 'test-key', opts);
+    expect((result as any)?.barWidth).toBeUndefined();
+  });
+
+  it('should not apply bar width when barWidth is undefined', () => {
+    const opts = {
+      seriesType: EchartsTimeseriesSeriesType.Bar,
+    };
+    const result = transformSeries(series, mockColorScale, 'test-key', opts);
+    expect((result as any)?.barWidth).toBeUndefined();
+  });
 });

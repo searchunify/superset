@@ -143,7 +143,11 @@ export default function transformProps(
     area,
     annotationLayers,
     barRadius,
+    barWidth,
     colorScheme,
+    showXAxis,
+    showYAxis,
+    showGridLines,
     contributionMode,
     forecastEnabled,
     groupby,
@@ -333,6 +337,7 @@ export default function transformProps(
         timeCompare: array,
         timeShiftColor,
         barRadius,
+        barWidth,
         seriesIndex: index,
         totalSeriesCount: rawSeries.length,
       },
@@ -487,12 +492,23 @@ export default function transformProps(
     name: xAxisTitle,
     nameGap: convertInteger(xAxisTitleMargin),
     nameLocation: 'middle',
+    show: showXAxis !== false, // Default to true if not specified
     axisLabel: {
       hideOverlap: true,
       formatter: xAxisFormatter,
       rotate: xAxisLabelRotation,
+      show: showXAxis !== false,
     },
-    minorTick: { show: minorTicks },
+    axisLine: {
+      show: showXAxis !== false,
+    },
+    axisTick: {
+      show: showXAxis !== false,
+    },
+    minorTick: { show: minorTicks && showXAxis !== false },
+    splitLine: {
+      show: showGridLines !== false,
+    },
     minInterval:
       xAxisType === AxisType.Time && timeGrainSqla
         ? TIMEGRAIN_TO_TIMESTAMP[
@@ -513,8 +529,7 @@ export default function transformProps(
     type: logAxis ? AxisType.Log : AxisType.Value,
     min: yAxisMin,
     max: yAxisMax,
-    minorTick: { show: minorTicks },
-    minorSplitLine: { show: minorSplitLine },
+    show: showYAxis !== false, // Default to true if not specified
     axisLabel: {
       formatter: getYAxisFormatter(
         metrics,
@@ -523,6 +538,18 @@ export default function transformProps(
         defaultFormatter,
         yAxisFormat,
       ),
+      show: showYAxis !== false,
+    },
+    axisLine: {
+      show: showYAxis !== false,
+    },
+    axisTick: {
+      show: showYAxis !== false,
+    },
+    minorTick: { show: minorTicks && showYAxis !== false },
+    minorSplitLine: { show: minorSplitLine && showGridLines !== false },
+    splitLine: {
+      show: showGridLines !== false,
     },
     scale: truncateYAxis,
     name: yAxisTitle,
