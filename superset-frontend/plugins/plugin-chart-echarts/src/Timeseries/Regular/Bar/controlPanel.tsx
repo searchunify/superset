@@ -319,6 +319,51 @@ const config: ControlPanelConfig = {
       controlSetRows: [
         ...seriesOrderSection,
         ['color_scheme'],
+        [
+          {
+            name: 'customSeriesColors',
+            config: {
+              type: 'TextAreaControl',
+              label: t('Custom Series Colors'),
+              description: t(
+                'Define custom colors for specific series. Format: {"Series Name": "#color"}',
+              ),
+              default: '{}',
+              initialValue: '{}',
+              language: 'json',
+              offerEditInModal: false,
+              minLines: 3,
+              maxLines: 8,
+              renderTrigger: true,
+            },
+          },
+        ],
+        [
+          {
+            name: 'barWidth',
+            config: {
+              type: 'TextControl',
+              label: t('Bar Width'),
+              description: t('Width of bars in pixels'),
+              default: 5,
+              renderTrigger: true,
+            },
+          },
+        ],
+        [
+          {
+            name: 'barRadius',
+            config: {
+              type: 'TextControl',
+              label: t('Bar Radius'),
+              description: t(
+                'Border radius of bars in pixels (0 for sharp corners)',
+              ),
+              default: 0,
+              renderTrigger: true,
+            },
+          },
+        ],
         ['time_shift_color'],
         ...showValueSection,
         [minorTicks],
@@ -342,6 +387,47 @@ const config: ControlPanelConfig = {
         ...richTooltipSection,
         [<ControlSubSectionHeader>{t('Y Axis')}</ControlSubSectionHeader>],
         ...createAxisControl('y'),
+        [
+          <ControlSubSectionHeader>
+            {t('Axis & Grid Display')}
+          </ControlSubSectionHeader>,
+        ],
+        [
+          {
+            name: 'showXAxis',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show X Axis'),
+              description: t('Show or hide the X axis'),
+              default: true,
+              renderTrigger: true,
+            },
+          },
+        ],
+        [
+          {
+            name: 'showYAxis',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show Y Axis'),
+              description: t('Show or hide the Y axis'),
+              default: true,
+              renderTrigger: true,
+            },
+          },
+        ],
+        [
+          {
+            name: 'showGridLines',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Show Grid Lines'),
+              description: t('Show or hide grid lines'),
+              default: true,
+              renderTrigger: true,
+            },
+          },
+        ],
       ],
     },
   ],
@@ -349,6 +435,11 @@ const config: ControlPanelConfig = {
     ...formData,
     metrics: getStandardizedControls().popAllMetrics(),
     groupby: getStandardizedControls().popAllColumns(),
+    // Ensure customSeriesColors is always a string for TextAreaControl
+    customSeriesColors:
+      typeof formData.customSeriesColors === 'string'
+        ? formData.customSeriesColors
+        : JSON.stringify(formData.customSeriesColors || {}),
   }),
 };
 
