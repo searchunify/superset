@@ -97,6 +97,7 @@ class CeleryConfig:
 
 STATIC_ASSETS_PREFIX = "/su-bi"
 CELERY_CONFIG = CeleryConfig
+APPLICATION_ROOT = "/su-bi/"
 
 FEATURE_FLAGS = {
     "EMBEDDED_SUPERSET": True,
@@ -125,7 +126,7 @@ HTTP_HEADERS = {
     "X-Frame-Options": "ALLOWALL"
 }
 
-GUEST_ROLE_NAME = "Gamma"
+GUEST_ROLE_NAME = "Public"
 
 TALISMAN_ENABLED = True
 # Allow embedding in iframes from localhost:8000
