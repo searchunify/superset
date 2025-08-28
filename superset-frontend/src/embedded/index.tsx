@@ -67,8 +67,11 @@ const EmbeddedRoute = () => (
 const EmbeddedApp = () => (
   <Router>
     {/* todo (embedded) remove this line after uuids are deployed */}
-    <Route path="/dashboard/:idOrSlug/embedded/" component={EmbeddedRoute} />
-    <Route path="/embedded/:uuid/" component={EmbeddedRoute} />
+    <Route
+      path="/su-bi/dashboard/:idOrSlug/embedded/"
+      component={EmbeddedRoute}
+    />
+    <Route path="/su-bi/embedded/:uuid/" component={EmbeddedRoute} />
   </Router>
 );
 

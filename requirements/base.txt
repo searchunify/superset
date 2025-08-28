@@ -116,6 +116,8 @@ flask-caching==2.3.0
     # via apache-superset (pyproject.toml)
 flask-compress==1.17
     # via apache-superset (pyproject.toml)
+flask-cors==4.0.0
+    # via apache-superset
 flask-jwt-extended==4.7.1
     # via flask-appbuilder
 flask-limiter==3.8.0
@@ -250,6 +252,10 @@ paramiko==3.5.0
     #   sshtunnel
 parsedatetime==2.6
     # via apache-superset (pyproject.toml)
+pillow==10.3.0
+    # via
+    #   apache-superset
+    #   matplotlib
 pgsanity==0.2.9
     # via apache-superset (pyproject.toml)
 platformdirs==3.8.1
