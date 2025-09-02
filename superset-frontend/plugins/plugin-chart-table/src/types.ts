@@ -33,6 +33,7 @@ import {
   ContextMenuFilters,
   CurrencyFormatter,
   Currency,
+  Datasource,
 } from '@superset-ui/core';
 import { ColorFormatters } from '@superset-ui/chart-controls';
 
@@ -49,9 +50,6 @@ export type TableColumnConfig = {
   colorPositiveNegative?: boolean;
   truncateLongCells?: boolean;
   currencyFormat?: Currency;
-  visible?: boolean;
-  customColumnName?: string;
-  displayTypeIcon?: boolean;
 };
 
 export interface DataColumnMeta {
@@ -71,7 +69,6 @@ export interface DataColumnMeta {
   isPercentMetric?: boolean;
   isNumeric?: boolean;
   config?: TableColumnConfig;
-  isChildColumn?: boolean;
 }
 
 export interface TableChartData {
@@ -114,38 +111,20 @@ export type BasicColorFormatterType = {
   mainArrow: string;
 };
 
-export type SortByItem = {
-  id: string;
-  key: string;
-  desc?: boolean;
-};
-
-export type SearchOption = {
-  value: string;
-  label: string;
-};
-
-export interface ServerPaginationData {
-  pageSize?: number;
-  currentPage?: number;
-  sortBy?: SortByItem[];
-  searchText?: string;
-  searchColumn?: string;
-}
-
 export interface TableChartTransformedProps<D extends DataRecord = DataRecord> {
   timeGrain?: TimeGranularity;
   height: number;
   width: number;
   rowCount?: number;
   serverPagination: boolean;
-  serverPaginationData: ServerPaginationData;
+  serverPaginationData: { pageSize?: number; currentPage?: number };
   setDataMask: SetDataMaskHook;
   isRawRecords?: boolean;
   data: D[];
   totals?: D;
   columns: DataColumnMeta[];
-  metrics?: (keyof D)[];
+  // CORRECTION: Update the 'metrics' type to be more flexible and match the popup's expectation.
+  metrics?: (string | { label: string })[];
   percentMetrics?: (keyof D)[];
   pageSize?: number;
   showCellBars?: boolean;
@@ -154,8 +133,6 @@ export interface TableChartTransformedProps<D extends DataRecord = DataRecord> {
   alignPositiveNegative?: boolean;
   colorPositiveNegative?: boolean;
   tableTimestampFormat?: string;
-  // These are dashboard filters, don't be confused with in-chart search filter
-  // enabled by `includeSearch`
   filters?: DataRecordFilters;
   emitCrossFilters?: boolean;
   onChangeFilter?: ChartProps['hooks']['onAddFilter'];
@@ -171,11 +148,7 @@ export interface TableChartTransformedProps<D extends DataRecord = DataRecord> {
   basicColorFormatters?: { [Key: string]: BasicColorFormatterType }[];
   basicColorColumnFormatters?: { [Key: string]: BasicColorFormatterType }[];
   startDateOffset?: string;
-  // For explore page to reset the server Pagination data
-  // if server page length is changed from control panel
-  hasServerPageLengthChanged: boolean;
-  serverPageLength: number;
-  slice_id: number;
+  datasource: Datasource;
 }
 
 export enum ColorSchemeEnum {
