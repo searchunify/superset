@@ -420,10 +420,21 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'linked_chart_id',
+            config: {
+              type: 'TextControl',
+              label: t('Linked Popup Chart ID'),
+              description: t('ID of the chart to show in popup'),
+              default: '',
+              renderTrigger: false,
+            }
+          },
+        ],
+        [
+          {
             name: 'page_length',
             config: {
               type: 'SelectControl',
-              freeForm: true,
               renderTrigger: true,
               label: t('Page length'),
               default: null,
@@ -433,7 +444,6 @@ const config: ControlPanelConfig = {
                 !controls?.server_pagination?.value,
             },
           },
-          null,
         ],
         [
           {

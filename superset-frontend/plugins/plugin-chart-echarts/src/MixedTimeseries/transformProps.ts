@@ -412,6 +412,10 @@ export default function transformProps(
         timeShiftColor,
       },
     );
+    if (transformedSeries && seriesType === EchartsTimeseriesSeriesType.Bar) {
+      (transformedSeries as echarts.BarSeriesOption).barWidth = formData.barWidth;
+    }
+    if (transformedSeries) series.push(transformedSeries);
     if (transformedSeries) series.push(transformedSeries);
   });
 
@@ -462,6 +466,11 @@ export default function transformProps(
         timeShiftColor,
       },
     );
+    if (transformedSeries && seriesTypeB === EchartsTimeseriesSeriesType.Bar) {
+      (transformedSeries as echarts.BarSeriesOption).barWidth =
+        formData.barWidthB ?? formData.barWidth;
+    }
+    if (transformedSeries) series.push(transformedSeries);
     if (transformedSeries) series.push(transformedSeries);
   });
 

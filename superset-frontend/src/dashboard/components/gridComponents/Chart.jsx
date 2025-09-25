@@ -430,7 +430,7 @@ const Chart = props => {
 
   return (
     <SliceContainer
-      className="chart-slice"
+      className={`chart-slice  su-chart-cont-${props.id}`}
       data-test="chart-grid-component"
       data-test-chart-id={props.id}
       data-test-viz-type={slice.viz_type}

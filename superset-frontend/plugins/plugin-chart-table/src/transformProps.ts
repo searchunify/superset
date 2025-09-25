@@ -461,7 +461,7 @@ const transformProps = (
     },
     emitCrossFilters,
   } = chartProps;
-
+  
   const {
     align_pn: alignPositiveNegative = true,
     color_pn: colorPositiveNegative = true,
@@ -480,7 +480,9 @@ const transformProps = (
     comparison_color_enabled: comparisonColorEnabled = false,
     comparison_color_scheme: comparisonColorScheme = ColorSchemeEnum.Green,
     comparison_type,
+    linked_chart_id,
   } = formData;
+  console.log('linked_chart_id', linked_chart_id);
   const isUsingTimeComparison =
     !isEmpty(time_compare) &&
     queryMode === QueryMode.Aggregate &&

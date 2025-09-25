@@ -97,7 +97,7 @@ class CeleryConfig:
 
 STATIC_ASSETS_PREFIX = "/su-bi"
 CELERY_CONFIG = CeleryConfig
-APPLICATION_ROOT = "/su-bi/"
+APPLICATION_ROOT = "/su-bi"
 
 FEATURE_FLAGS = {
     "EMBEDDED_SUPERSET": True,

@@ -24,6 +24,7 @@ import {
   MutableRefObject,
   CSSProperties,
   DragEvent,
+  useState,
 } from 'react';
 
 import {
@@ -39,7 +40,7 @@ import {
   Row,
 } from 'react-table';
 import { matchSorter, rankings } from 'match-sorter';
-import { typedMemo, usePrevious } from '@superset-ui/core';
+import { DataRecord, typedMemo, usePrevious } from '@superset-ui/core';
 import { isEqual } from 'lodash';
 import GlobalFilter, { GlobalFilterProps } from './components/GlobalFilter';
 import SelectPageSize, {
@@ -48,6 +49,8 @@ import SelectPageSize, {
 } from './components/SelectPageSize';
 import SimplePagination from './components/Pagination';
 import useSticky from './hooks/useSticky';
+import { DetailPopup } from '../DetailPopup';
+import { ContextMenu } from '../ContextMenu';
 import { PAGE_SIZE_OPTIONS } from '../consts';
 import { sortAlphanumericCaseInsensitive } from './utils/sortAlphanumericCaseInsensitive';
 
@@ -135,6 +138,22 @@ export default typedMemo(function DataTable<D extends object>({
   const paginationRef = useRef<HTMLDivElement>(null);
   const wrapperRef = userWrapperRef || defaultWrapperRef;
   const paginationData = JSON.stringify(serverPaginationData);
+
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    row?: Row<D>;
+    columnId?: string;
+    columnName?: string;
+  }>({ visible: false, x: 0, y: 0 });
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupRowData, setPopupRowData] = useState<DataRecord | undefined>(
+    undefined,
+  );
+  const [popupColumn, setPopupColumn] = useState<DataColumnMeta | undefined>(
+    undefined,
+  );
 
   const defaultGetTableSize = useCallback(() => {
     if (wrapperRef.current) {
@@ -255,6 +274,31 @@ export default typedMemo(function DataTable<D extends object>({
     e.preventDefault();
   };
 
+  const handleCellRightClick = (
+    e: React.MouseEvent<HTMLTableCellElement>,
+    row: Row<D>,
+    columnId: string,
+    columnName: string,
+  ) => {
+    e.preventDefault();
+    console.log('columnId', columnId);
+    console.log('row', row);
+
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      row,
+      columnId,
+      columnName,
+    });
+  };
+
+  const handleCloseContextMenu = () => {
+    setContextMenu(prev => ({ ...prev, visible: false }));
+  };
+
+
   const renderTable = () => (
     <table {...getTableProps({ className: tableClassName })}>
       <thead>
@@ -283,8 +327,37 @@ export default typedMemo(function DataTable<D extends object>({
             const { key: rowKey, ...rowProps } = row.getRowProps();
             return (
               <tr key={rowKey || row.id} {...rowProps} role="row">
-                {row.cells.map(cell =>
-                  cell.render('Cell', { key: cell.column.id }),
+                {row.cells.map(
+                  cell => {
+                    const { key: cellKey, ...cellProps } = cell.getCellProps();
+                    return (
+                      <td
+                        key={cellKey || cell.column.id}
+                        {...cellProps}
+                        onContextMenu={e => {
+                          console.log('cell.column', cell.column);
+                          console.log('cell.column.key', cell.column.key);
+
+                          handleCellRightClick(
+                            e,
+                            row,
+                            cell.column.id,
+                            typeof cell.column.Header?.name === 'string'
+                              ? cell.column.Header.name
+                              : cell.column.id, // fallback if Header is a ReactNode
+                          );
+                        }}
+                      >
+                        {cell.render('Cell')}
+                      </td>
+                    );
+                  },
+                  // cell.render('Cell', {
+                  //   key: cell.column.id,
+                  //   onContextMenu: (
+                  //     e: React.MouseEvent<HTMLTableCellElement>,
+                  //   ) => handleCellRightClick(e, row, cell.column.id),
+                  // }),
                 )}
               </tr>
             );
@@ -414,6 +487,43 @@ export default typedMemo(function DataTable<D extends object>({
           onPageChange={resultOnPageChange}
         />
       ) : null}
+
+      {/* <ContextMenu
+        visible={contextMenu.visible}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        onClose={handleCloseContextMenu}
+        onMoreDetail={handleMoreDetail}
+        onDrillToDetail={() => console.log('Drill to detail')}
+        isDrillToDetailEnabled={true}
+      /> */}
+      <ContextMenu
+        visible={contextMenu.visible}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        onClose={() => setContextMenu({ ...contextMenu, visible: false })}
+        onMoreDetail={() => {
+          if (contextMenu.row && contextMenu.columnId) {
+            setPopupRowData({
+              colNames: Object.keys(contextMenu.row.original),
+              values: contextMenu.row.values
+              });
+            setPopupColumn({ key: contextMenu.columnId }); // minimal DataColumnMeta
+            setPopupVisible(true);
+          }
+        }}
+        onDrillToDetail={() => console.log('TODO drill')}
+        isDrillToDetailEnabled={true}
+      />
+
+      <DetailPopup
+        visible={popupVisible}
+        onClose={() => setPopupVisible(false)}
+        rowData={popupRowData}
+        clickedColumn={popupColumn}
+        sliceId={116}
+        dashboardFilters={{}} // or omit entirely
+      />
     </div>
   );
 });
