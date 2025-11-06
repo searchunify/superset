@@ -158,6 +158,21 @@ function createCustomizeSection(
     ],
     [
       {
+        name: `barWidth${controlSuffix}`,
+        config: {
+          type: 'TextControl',
+          label: t('Bar Width'),
+          description: t('Width of bars in pixels'),
+          default: 5,
+          renderTrigger: true,
+          visibility: ({ controls }) =>
+            controls[`seriesType${controlSuffix}`]?.value ===
+            EchartsTimeseriesSeriesType.Bar,
+        },
+      },
+    ],
+    [
+      {
         name: `stack${controlSuffix}`,
         config: {
           type: 'CheckboxControl',
