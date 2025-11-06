@@ -78,7 +78,7 @@ services:
     env_file: docker/.env
     build:
       <<: *common-build
-    container_name: superset_app
+    container_name: superset_app_fork
     command: ["/app/docker/docker-bootstrap.sh", "app"]
     restart: unless-stopped
     ports:
@@ -143,8 +143,9 @@ services:
     user: *superset-user
     volumes: *superset-volumes
     environment:
+      SUPERSET_LOAD_EXAMPLES: "no"
       CYPRESS_CONFIG: "${CYPRESS_CONFIG:-}"
-      SUPERSET_LOAD_EXAMPLES: "${SUPERSET_LOAD_EXAMPLES:-yes}"
+      # SUPERSET_LOAD_EXAMPLES: "${SUPERSET_LOAD_EXAMPLES:-yes}"
       SUPERSET_LOG_LEVEL: "${SUPERSET_LOG_LEVEL:-info}"
     healthcheck:
       disable: true
@@ -162,7 +163,7 @@ services:
     environment:
       # set this to false if you have perf issues running the npm i; npm run dev in-docker
       # if you do so, you have to run this manually on the host, which should perform better!
-      BUILD_SUPERSET_FRONTEND_IN_DOCKER: true
+      BUILD_SUPERSET_FRONTEND_IN_DOCKER: false
       NPM_RUN_PRUNE: false
       SCARF_ANALYTICS: "${SCARF_ANALYTICS:-}"
       # configuring the dev-server to use the host.docker.internal to connect to the backend
